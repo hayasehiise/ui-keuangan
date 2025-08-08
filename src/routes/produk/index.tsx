@@ -2,10 +2,16 @@ import { createFileRoute } from '@tanstack/react-router'
 import { redirect } from '@tanstack/react-router'
 import { getCurrentUser } from '@/api/auth'
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute('/produk/')({
   beforeLoad: async ({ context }) => {
+    const queryClient = context.queryClient
+    const cached = queryClient.getQueriesData({
+      queryKey: ['authUser'],
+    })
+    if (cached) return
+
     try {
-      await context.queryClient.ensureQueryData({
+      await queryClient.fetchQuery({
         queryKey: ['authUser'],
         queryFn: getCurrentUser,
       })
@@ -13,13 +19,13 @@ export const Route = createFileRoute('/')({
       throw redirect({ to: '/login' })
     }
   },
-  component: App,
+  component: ProdukPage,
 })
 
-function App() {
+function ProdukPage() {
   return (
     <div className="text-center">
-      <h1>Dashboard Page</h1>
+      <h1>Produk Page</h1>
     </div>
   )
 }
