@@ -1,22 +1,17 @@
-import { getCurrentUser } from '@/api/auth'
 import { useLogin } from '@/lib/auth'
+import { loginAuthOption } from '@/query/authUser'
 import { useForm } from '@tanstack/react-form'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/login')({
   beforeLoad: async ({ context }) => {
     try {
-      const user = await context.queryClient.fetchQuery({
-        queryKey: ['authUser'],
-        queryFn: getCurrentUser,
-        staleTime: 1000 * 60 * 5,
-      })
-      console.log(`logged in as ${user.name}`)
+      const user = await context.queryClient.fetchQuery(loginAuthOption())
       if (user) {
         return redirect({ to: '/' })
       }
     } catch {
-      console.log('Not logged in, proceed to login page')
+      console.error('Not logged in, proceed to login page')
     }
   },
   component: LoginPage,
@@ -66,6 +61,7 @@ function LoginPage() {
             <label htmlFor={field.name}>Password</label>
             <input
               id={field.name}
+              type="password"
               value={field.state.value ?? ''}
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
@@ -73,11 +69,11 @@ function LoginPage() {
           </div>
         )}
       />
-      <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
-        {([canSubmit, isSubmitting]) => (
+      <form.Subscribe selector={(s) => s.canSubmit}>
+        {(canSubmit) => (
           <div>
-            <button type="submit" disabled={!canSubmit || isSubmitting}>
-              {isSubmitting ? 'Logging in' : 'Login'}
+            <button type="submit" disabled={!canSubmit}>
+              {canSubmit ? 'Login' : 'Waiting'}
             </button>
           </div>
         )}

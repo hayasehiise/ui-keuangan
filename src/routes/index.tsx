@@ -1,14 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { redirect } from '@tanstack/react-router'
-import { getCurrentUser } from '@/api/auth'
+import { authUserOption } from '@/query/authUser'
 
 export const Route = createFileRoute('/')({
   beforeLoad: async ({ context }) => {
     try {
-      await context.queryClient.ensureQueryData({
-        queryKey: ['authUser'],
-        queryFn: getCurrentUser,
-      })
+      await context.queryClient.ensureQueryData(authUserOption())
     } catch {
       throw redirect({ to: '/login' })
     }
