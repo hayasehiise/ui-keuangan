@@ -5,7 +5,8 @@ import { authUserOption } from '@/query/authUser'
 export const Route = createFileRoute('/')({
   beforeLoad: async ({ context }) => {
     try {
-      await context.queryClient.ensureQueryData(authUserOption())
+      const user = await context.queryClient.ensureQueryData(authUserOption())
+      return { user }
     } catch {
       throw redirect({ to: '/login' })
     }
@@ -14,6 +15,8 @@ export const Route = createFileRoute('/')({
 })
 
 function App() {
+  const { user } = Route.useRouteContext()
+  console.log(user)
   return (
     <div className="text-center">
       <h1>Dashboard Page</h1>

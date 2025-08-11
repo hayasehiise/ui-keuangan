@@ -3,7 +3,7 @@ import { loginAuthOption } from '@/query/authUser'
 import { useForm } from '@tanstack/react-form'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/login')({
+export const Route = createFileRoute('/login/')({
   beforeLoad: async ({ context }) => {
     try {
       const user = await context.queryClient.fetchQuery(loginAuthOption())
