@@ -9,24 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as LoginRouteRouteImport } from './routes/login/route'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ProdukIndexRouteImport } from './routes/produk/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as LayoutIndexRouteImport } from './routes/_layout.index'
+import { Route as LayoutProdukRouteImport } from './routes/_layout.produk'
 
+const LayoutRoute = LayoutRouteImport.update({
+  id: '/_layout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRouteRoute = LoginRouteRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProdukIndexRoute = ProdukIndexRouteImport.update({
-  id: '/produk/',
-  path: '/produk/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
@@ -34,60 +29,69 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
   path: '/',
   getParentRoute: () => LoginRouteRoute,
 } as any)
+const LayoutIndexRoute = LayoutIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutProdukRoute = LayoutProdukRouteImport.update({
+  id: '/produk',
+  path: '/produk',
+  getParentRoute: () => LayoutRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/login': typeof LoginRouteRouteWithChildren
+  '/produk': typeof LayoutProdukRoute
+  '/': typeof LayoutIndexRoute
   '/login/': typeof LoginIndexRoute
-  '/produk': typeof ProdukIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/produk': typeof LayoutProdukRoute
+  '/': typeof LayoutIndexRoute
   '/login': typeof LoginIndexRoute
-  '/produk': typeof ProdukIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/login': typeof LoginRouteRouteWithChildren
+  '/_layout': typeof LayoutRouteWithChildren
+  '/_layout/produk': typeof LayoutProdukRoute
+  '/_layout/': typeof LayoutIndexRoute
   '/login/': typeof LoginIndexRoute
-  '/produk/': typeof ProdukIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/login/' | '/produk'
+  fullPaths: '/login' | '/produk' | '/' | '/login/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/produk'
-  id: '__root__' | '/' | '/login' | '/login/' | '/produk/'
+  to: '/produk' | '/' | '/login'
+  id:
+    | '__root__'
+    | '/login'
+    | '/_layout'
+    | '/_layout/produk'
+    | '/_layout/'
+    | '/login/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   LoginRouteRoute: typeof LoginRouteRouteWithChildren
-  ProdukIndexRoute: typeof ProdukIndexRoute
+  LayoutRoute: typeof LayoutRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_layout': {
+      id: '/_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof LayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/produk/': {
-      id: '/produk/'
-      path: '/produk'
-      fullPath: '/produk'
-      preLoaderRoute: typeof ProdukIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login/': {
@@ -96,6 +100,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/login/'
       preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof LoginRouteRoute
+    }
+    '/_layout/': {
+      id: '/_layout/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof LayoutIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/produk': {
+      id: '/_layout/produk'
+      path: '/produk'
+      fullPath: '/produk'
+      preLoaderRoute: typeof LayoutProdukRouteImport
+      parentRoute: typeof LayoutRoute
     }
   }
 }
@@ -112,10 +130,22 @@ const LoginRouteRouteWithChildren = LoginRouteRoute._addFileChildren(
   LoginRouteRouteChildren,
 )
 
+interface LayoutRouteChildren {
+  LayoutProdukRoute: typeof LayoutProdukRoute
+  LayoutIndexRoute: typeof LayoutIndexRoute
+}
+
+const LayoutRouteChildren: LayoutRouteChildren = {
+  LayoutProdukRoute: LayoutProdukRoute,
+  LayoutIndexRoute: LayoutIndexRoute,
+}
+
+const LayoutRouteWithChildren =
+  LayoutRoute._addFileChildren(LayoutRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   LoginRouteRoute: LoginRouteRouteWithChildren,
-  ProdukIndexRoute: ProdukIndexRoute,
+  LayoutRoute: LayoutRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

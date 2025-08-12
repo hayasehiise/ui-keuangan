@@ -2,24 +2,21 @@ import { createFileRoute } from '@tanstack/react-router'
 import { redirect } from '@tanstack/react-router'
 import { authUserOption } from '@/query/authUser'
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute('/_layout/produk')({
   beforeLoad: async ({ context }) => {
     try {
-      const user = await context.queryClient.ensureQueryData(authUserOption())
-      return { user }
+      await context.queryClient.ensureQueryData(authUserOption())
     } catch {
       throw redirect({ to: '/login' })
     }
   },
-  component: App,
+  component: ProdukPage,
 })
 
-function App() {
-  const { user } = Route.useRouteContext()
-  console.log(user)
+function ProdukPage() {
   return (
     <div className="text-center">
-      <h1>Dashboard Page</h1>
+      <h1>Produk Page</h1>
     </div>
   )
 }

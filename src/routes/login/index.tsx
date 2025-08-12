@@ -33,51 +33,66 @@ function LoginPage() {
   })
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        form.handleSubmit()
-      }}
-    >
-      <form.Field
-        name="username"
-        children={(field) => (
-          <div>
-            <label htmlFor={field.name}>Username</label>
-            <input
-              id={field.name}
-              value={field.state.value ?? ''}
-              onBlur={field.handleBlur}
-              onChange={(e) => field.handleChange(e.target.value)}
-            />
-          </div>
-        )}
-      />
-      <form.Field
-        name="password"
-        children={(field) => (
-          <div>
-            <label htmlFor={field.name}>Password</label>
-            <input
-              id={field.name}
-              type="password"
-              value={field.state.value ?? ''}
-              onBlur={field.handleBlur}
-              onChange={(e) => field.handleChange(e.target.value)}
-            />
-          </div>
-        )}
-      />
-      <form.Subscribe selector={(s) => s.canSubmit}>
-        {(canSubmit) => (
-          <div>
-            <button type="submit" disabled={!canSubmit}>
-              {canSubmit ? 'Login' : 'Waiting'}
-            </button>
-          </div>
-        )}
-      </form.Subscribe>
-    </form>
+    <div className="">
+      <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            form.handleSubmit()
+          }}
+        >
+          <legend className="fieldset-legend">Login</legend>
+          <form.Field
+            name="username"
+            children={(field) => (
+              <div>
+                <label htmlFor={field.name} className="label">
+                  Username
+                </label>
+                <input
+                  id={field.name}
+                  value={field.state.value ?? ''}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  className="input"
+                />
+              </div>
+            )}
+          />
+          <form.Field
+            name="password"
+            children={(field) => (
+              <div>
+                <label htmlFor={field.name} className="label">
+                  Password
+                </label>
+                <input
+                  id={field.name}
+                  type="password"
+                  value={field.state.value ?? ''}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  className="input"
+                />
+              </div>
+            )}
+          />
+          <form.Subscribe selector={(s) => s.canSubmit}>
+            {(canSubmit) => (
+              <div>
+                <button
+                  type="submit"
+                  disabled={!canSubmit}
+                  className="btn btn-neutral mt-4"
+                >
+                  {canSubmit ? 'Login' : 'Waiting'}
+                </button>
+              </div>
+            )}
+          </form.Subscribe>
+        </form>
+      </fieldset>
+    </div>
   )
 }

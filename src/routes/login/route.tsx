@@ -6,7 +6,7 @@ export const Route = createFileRoute('/login')({
 
 function LoginLayout() {
   return (
-    <div className="flex w-full h-screen">
+    <div className="flex w-full h-screen justify-center items-center">
       <Outlet />
     </div>
   )
