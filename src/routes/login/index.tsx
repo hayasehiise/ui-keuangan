@@ -86,7 +86,11 @@ function LoginPage() {
                   disabled={!canSubmit}
                   className="btn btn-neutral mt-4"
                 >
-                  {canSubmit ? 'Login' : 'Waiting'}
+                  {canSubmit ? (
+                    'Login'
+                  ) : (
+                    <span className="loading loading-bars loading-sm"></span>
+                  )}
                 </button>
               </div>
             )}

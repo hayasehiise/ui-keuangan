@@ -1,25 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { redirect } from '@tanstack/react-router'
-import { authUserOption } from '@/query/authUser'
 
 export const Route = createFileRoute('/_layout/')({
-  beforeLoad: async ({ context }) => {
-    try {
-      const user = await context.queryClient.ensureQueryData(authUserOption())
-      return { user }
-    } catch {
-      throw redirect({ to: '/login' })
-    }
-  },
-  component: App,
+  component: IndexPage,
 })
 
-function App() {
-  const { user } = Route.useRouteContext()
-  console.log(user)
+function IndexPage() {
   return (
-    <div className="text-center">
-      <h1>Dashboard Page</h1>
+    <div className="flex flex-col w-full px-10 py-5">
+      <p className="font-black text-4xl">Dashboard Page</p>
     </div>
   )
 }

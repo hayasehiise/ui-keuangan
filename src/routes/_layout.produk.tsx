@@ -1,22 +1,225 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { redirect } from '@tanstack/react-router'
-import { authUserOption } from '@/query/authUser'
+import { createFileRoute, useSearch, useNavigate } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
+import { useVirtualizer } from '@tanstack/react-virtual'
+import { getProdukOption } from '@/query/produk'
+import { useEffect, useState, useRef } from 'react'
 
 export const Route = createFileRoute('/_layout/produk')({
-  beforeLoad: async ({ context }) => {
-    try {
-      await context.queryClient.ensureQueryData(authUserOption())
-    } catch {
-      throw redirect({ to: '/login' })
+  component: ProdukPage,
+  validateSearch: (search) => {
+    return {
+      page: Number(search.page) || 1,
+      limit: Number(search.limit) || 10,
+      search: String(search.search || ''),
     }
   },
-  component: ProdukPage,
 })
 
 function ProdukPage() {
+  const { page, limit, search } = useSearch({ from: '/_layout/produk' })
+  const navigate = useNavigate()
+  const { data, isLoading, isError } = useQuery(
+    getProdukOption(page, limit, search),
+  )
+  const [searchData, setSearchData] = useState(search)
+  const [limitValue, setLimitValue] = useState(10)
+  const [pageValue, setPageValue] = useState(1)
+  const parentRef = useRef<HTMLDivElement>(null)
+
+  const rowVirtualizer = useVirtualizer({
+    count: data?.data.length ?? 0,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 50,
+    overscan: 5,
+  })
+
+  useEffect(() => {
+    const handlerSearch = setTimeout(() => {
+      navigate({
+        to: '/produk',
+        search: { page: pageValue, limit: limitValue, search: searchData },
+      })
+    }, 1000)
+
+    return () => clearTimeout(handlerSearch)
+  }, [pageValue, searchData, limitValue, navigate])
+
+  console.log(data)
+  if (isLoading) {
+    return (
+      <div className="flex flex-col w-full px-10 py-5 justify-center items-center">
+        <img src="/loading.gif" alt="loading" className="w-40" />
+      </div>
+    )
+  }
+  if (isError) return <div>Error Fetching Data</div>
   return (
-    <div className="text-center">
-      <h1>Produk Page</h1>
+    <div className="flex flex-col w-full px-10 py-5 gap-5">
+      <p className="font-black text-4xl">Produk Page</p>
+      <div className="flex flex-row mb-4 gap-5">
+        <input
+          value={searchData}
+          onChange={(e) => setSearchData(e.target.value)}
+          placeholder="Cari produk..."
+          className="input"
+        />
+        <select
+          value={limitValue}
+          onChange={(e) => setLimitValue(Number(e.target.value))}
+          className="select select-bordered w-36"
+        >
+          {[10, 20, 50, 100].map((num) => (
+            <option key={num} value={num}>
+              {num} data
+            </option>
+          ))}
+        </select>
+      </div>
+      {limitValue > 10 ? (
+        <div
+          ref={parentRef}
+          style={{ height: '500px', overflow: 'auto' }}
+          className="rounded-box border border-base-content/5 bg-base-100"
+        >
+          <table className="table w-full">
+            <thead style={{ gridColumn: '1/-1', position: 'relative' }}>
+              <tr
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns:
+                    '50px 1.5fr 1.2fr 100px 1fr 1fr 1fr 1fr 1fr',
+                  width: '100%',
+                }}
+              >
+                <th></th>
+                <th>Nama Produk</th>
+                <th>Harga</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Tanggal Input Data</th>
+                <th colSpan={3}>Aksi</th>
+              </tr>
+            </thead>
+            <tbody
+              style={{
+                gridColumn: '1 / -1',
+                height: rowVirtualizer.getTotalSize(),
+                position: 'relative',
+              }}
+            >
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const produk = data.data[virtualRow.index]
+                return (
+                  <tr
+                    key={produk.id}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns:
+                        '50px 1.5fr 1.2fr 100px 1fr 1fr 1fr 1fr 1fr',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      transform: `translateY(${virtualRow.start}px)`,
+                    }}
+                  >
+                    <td>{virtualRow.index + 1}</td>
+                    <td>{produk.nama}</td>
+                    <td>{produk.harga}</td>
+                    <td>{produk.stock}</td>
+                    <td>
+                      {produk.status === 'TERSEDIA' ? 'Tersedia' : 'Habis'}
+                    </td>
+                    <td>
+                      {new Date(produk.createdAt).toLocaleDateString('id-ID', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                      })}
+                    </td>
+                    <td>+1 stok</td>
+                    <td>Update</td>
+                    <td>Delete</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+          <table className="table w-full">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Nama Produk</th>
+                <th>Harga</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Tanggal Input Data</th>
+                <th colSpan={3}>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.data.map((produk, index) => (
+                <tr key={produk.id}>
+                  <td>{index + 1}</td>
+                  <td>{produk.nama}</td>
+                  <td>{produk.harga}</td>
+                  <td>{produk.stock}</td>
+                  <td>{produk.status === 'TERSEDIA' ? 'Tersedia' : 'Habis'}</td>
+                  <td>
+                    {new Date(produk.createdAt).toLocaleDateString('id-ID', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                    })}
+                  </td>
+                  <td>+1 stok</td>
+                  <td>Update</td>
+                  <td>Delete</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      {/* <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+        <table className="table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Nama Produk</th>
+              <th>Harga</th>
+              <th>Stock</th>
+              <th>Status</th>
+              <th>Tanggal Input Data</th>
+              <th colSpan={3}>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.data.map((produk, index) => (
+              <tr key={produk.id}>
+                <td>{index + 1}</td>
+                <td>{produk.nama}</td>
+                <td>{produk.harga}</td>
+                <td>{produk.stock}</td>
+                <td>{produk.status === 'TERSEDIA' ? 'Tersedia' : 'Habis'}</td>
+                <td>
+                  {new Date(produk.createdAt).toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                  })}
+                </td>
+                <td>+1 stok</td>
+                <td>Update</td>
+                <td>Delete</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div> */}
     </div>
   )
 }
