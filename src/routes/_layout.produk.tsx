@@ -1,8 +1,7 @@
 import { createFileRoute, useSearch, useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { useVirtualizer } from '@tanstack/react-virtual'
 import { getProdukOption } from '@/query/produk'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 
 export const Route = createFileRoute('/_layout/produk')({
   component: ProdukPage,
@@ -24,14 +23,6 @@ function ProdukPage() {
   const [searchData, setSearchData] = useState(search)
   const [limitValue, setLimitValue] = useState(10)
   const [pageValue, setPageValue] = useState(1)
-  const parentRef = useRef<HTMLDivElement>(null)
-
-  const rowVirtualizer = useVirtualizer({
-    count: data?.data.length ?? 0,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 50,
-    overscan: 5,
-  })
 
   useEffect(() => {
     const handlerSearch = setTimeout(() => {
@@ -63,128 +54,8 @@ function ProdukPage() {
           placeholder="Cari produk..."
           className="input"
         />
-        <select
-          value={limitValue}
-          onChange={(e) => setLimitValue(Number(e.target.value))}
-          className="select select-bordered w-36"
-        >
-          {[10, 20, 50, 100].map((num) => (
-            <option key={num} value={num}>
-              {num} data
-            </option>
-          ))}
-        </select>
       </div>
-      {limitValue > 10 ? (
-        <div
-          ref={parentRef}
-          style={{ height: '500px', overflow: 'auto' }}
-          className="rounded-box border border-base-content/5 bg-base-100"
-        >
-          <table className="table w-full">
-            <thead style={{ gridColumn: '1/-1', position: 'relative' }}>
-              <tr
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns:
-                    '50px 1.5fr 1.2fr 100px 1fr 1fr 1fr 1fr 1fr',
-                  width: '100%',
-                }}
-              >
-                <th></th>
-                <th>Nama Produk</th>
-                <th>Harga</th>
-                <th>Stock</th>
-                <th>Status</th>
-                <th>Tanggal Input Data</th>
-                <th colSpan={3}>Aksi</th>
-              </tr>
-            </thead>
-            <tbody
-              style={{
-                gridColumn: '1 / -1',
-                height: rowVirtualizer.getTotalSize(),
-                position: 'relative',
-              }}
-            >
-              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                const produk = data.data[virtualRow.index]
-                return (
-                  <tr
-                    key={produk.id}
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns:
-                        '50px 1.5fr 1.2fr 100px 1fr 1fr 1fr 1fr 1fr',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      transform: `translateY(${virtualRow.start}px)`,
-                    }}
-                  >
-                    <td>{virtualRow.index + 1}</td>
-                    <td>{produk.nama}</td>
-                    <td>{produk.harga}</td>
-                    <td>{produk.stock}</td>
-                    <td>
-                      {produk.status === 'TERSEDIA' ? 'Tersedia' : 'Habis'}
-                    </td>
-                    <td>
-                      {new Date(produk.createdAt).toLocaleDateString('id-ID', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                      })}
-                    </td>
-                    <td>+1 stok</td>
-                    <td>Update</td>
-                    <td>Delete</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
-          <table className="table w-full">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Nama Produk</th>
-                <th>Harga</th>
-                <th>Stock</th>
-                <th>Status</th>
-                <th>Tanggal Input Data</th>
-                <th colSpan={3}>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.data.map((produk, index) => (
-                <tr key={produk.id}>
-                  <td>{index + 1}</td>
-                  <td>{produk.nama}</td>
-                  <td>{produk.harga}</td>
-                  <td>{produk.stock}</td>
-                  <td>{produk.status === 'TERSEDIA' ? 'Tersedia' : 'Habis'}</td>
-                  <td>
-                    {new Date(produk.createdAt).toLocaleDateString('id-ID', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                    })}
-                  </td>
-                  <td>+1 stok</td>
-                  <td>Update</td>
-                  <td>Delete</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-      {/* <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+      <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
         <table className="table">
           <thead>
             <tr>
@@ -219,7 +90,7 @@ function ProdukPage() {
             ))}
           </tbody>
         </table>
-      </div> */}
+      </div>
     </div>
   )
 }
