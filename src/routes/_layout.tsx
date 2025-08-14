@@ -6,17 +6,24 @@ import {
   useRouteContext,
 } from '@tanstack/react-router'
 import { authUserOption } from '@/query/authUser'
+import { getCurrentUser } from '@/api/auth'
 import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/_layout')({
   beforeLoad: async ({ context }) => {
     try {
-      const user = await context.queryClient.ensureQueryData(authUserOption())
+      const data = await getCurrentUser()
+      const user = context.queryClient.setQueryData(
+        authUserOption().queryKey,
+        data,
+      )
       return { user }
     } catch {
       throw redirect({ to: '/login' })
     }
   },
+  pendingComponent: () => <div>Loading user...</div>,
   component: AppLayout,
 })
 

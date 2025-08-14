@@ -22,9 +22,17 @@ export const Route = createFileRoute('/_layout/produk')({
 function ProdukPage() {
   const { page, limit, search } = useSearch({ from: '/_layout/produk' })
   const navigate = useNavigate()
-  const { data, isLoading, isError } = useQuery(
+  const { data, isLoading, isError, error } = useQuery(
     getProdukOption(page, limit, search),
   )
+
+  // Handle error logging
+  useEffect(() => {
+    if (isError && error) {
+      console.log(error)
+    }
+  }, [isError, error])
+
   const [searchData, setSearchData] = useState(search)
   const [limitValue, setLimitValue] = useState(limit)
   const [pageValue, setPageValue] = useState(page)
@@ -107,6 +115,7 @@ function ProdukPage() {
     )
   }
   if (isError) return <div>Error Fetching Data</div>
+
   return (
     <div className="flex flex-col w-full px-10 py-5 gap-5">
       <p className="font-black text-4xl">Produk Page</p>
@@ -133,15 +142,6 @@ function ProdukPage() {
                 ))}
               </tr>
             ))}
-            {/* <tr>
-              <th></th>
-              <th>Nama Produk</th>
-              <th>Harga</th>
-              <th>Stock</th>
-              <th>Status</th>
-              <th>Tanggal Input Data</th>
-              <th colSpan={3}>Aksi</th>
-            </tr> */}
           </thead>
           <tbody>
             {table.getRowModel().rows.map((row) => (
@@ -153,27 +153,29 @@ function ProdukPage() {
                 ))}
               </tr>
             ))}
-            {/* {data.data.map((produk, index) => (
-              <tr key={produk.id}>
-                <td>{index + 1}</td>
-                <td>{produk.nama}</td>
-                <td>{produk.harga}</td>
-                <td>{produk.stock}</td>
-                <td>{produk.status === 'TERSEDIA' ? 'Tersedia' : 'Habis'}</td>
-                <td>
-                  {new Date(produk.createdAt).toLocaleDateString('id-ID', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                  })}
-                </td>
-                <td>+1 stok</td>
-                <td>Update</td>
-                <td>Delete</td>
-              </tr>
-            ))} */}
           </tbody>
         </table>
+      </div>
+      <div className="join">
+        <button
+          className="join-item btn"
+          onClick={() => setPageValue((old) => Math.max(old - 1, 1))}
+          disabled={pageValue === 1}
+        >
+          «
+        </button>
+        <button className="join-item btn">Page {pageValue}</button>
+        <button
+          className="join-item btn"
+          onClick={() => {
+            if (pageValue < data.totalPage) {
+              setPageValue((old) => old + 1)
+            }
+          }}
+          disabled={pageValue === data.totalPage}
+        >
+          »
+        </button>
       </div>
     </div>
   )

@@ -1,24 +1,18 @@
 import { env } from '@/env'
+import axios from 'axios'
 
-const apiUrl = env.VITE_API_URL
+const api = axios.create({
+  baseURL: env.VITE_API_URL,
+  withCredentials: true,
+})
 
 export async function getProduk(page: number, limit: number, search?: string) {
-  const params = new URLSearchParams({
-    page: String(page),
-    limit: String(limit),
-  })
-
-  if (search) {
-    params.append('search', search)
+  const params = {
+    page,
+    limit,
+    ...(search ? { search } : {}),
   }
 
-  const res = await fetch(`${apiUrl}/produk?${params.toString()}`, {
-    credentials: 'include',
-  })
-
-  if (!res.ok) {
-    throw new Error('Gagal Memuat Data Produk')
-  }
-
-  return res.json()
+  const { data } = await api.get('/produk', { params })
+  return data
 }
