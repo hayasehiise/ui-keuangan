@@ -13,6 +13,7 @@ import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as LoginRouteRouteImport } from './routes/login/route'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as LayoutIndexRouteImport } from './routes/_layout.index'
+import { Route as LayoutUserRouteImport } from './routes/_layout.user'
 import { Route as LayoutProdukRouteImport } from './routes/_layout.produk'
 
 const LayoutRoute = LayoutRouteImport.update({
@@ -34,6 +35,11 @@ const LayoutIndexRoute = LayoutIndexRouteImport.update({
   path: '/',
   getParentRoute: () => LayoutRoute,
 } as any)
+const LayoutUserRoute = LayoutUserRouteImport.update({
+  id: '/user',
+  path: '/user',
+  getParentRoute: () => LayoutRoute,
+} as any)
 const LayoutProdukRoute = LayoutProdukRouteImport.update({
   id: '/produk',
   path: '/produk',
@@ -43,11 +49,13 @@ const LayoutProdukRoute = LayoutProdukRouteImport.update({
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRouteRouteWithChildren
   '/produk': typeof LayoutProdukRoute
+  '/user': typeof LayoutUserRoute
   '/': typeof LayoutIndexRoute
   '/login/': typeof LoginIndexRoute
 }
 export interface FileRoutesByTo {
   '/produk': typeof LayoutProdukRoute
+  '/user': typeof LayoutUserRoute
   '/': typeof LayoutIndexRoute
   '/login': typeof LoginIndexRoute
 }
@@ -56,19 +64,21 @@ export interface FileRoutesById {
   '/login': typeof LoginRouteRouteWithChildren
   '/_layout': typeof LayoutRouteWithChildren
   '/_layout/produk': typeof LayoutProdukRoute
+  '/_layout/user': typeof LayoutUserRoute
   '/_layout/': typeof LayoutIndexRoute
   '/login/': typeof LoginIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/login' | '/produk' | '/' | '/login/'
+  fullPaths: '/login' | '/produk' | '/user' | '/' | '/login/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/produk' | '/' | '/login'
+  to: '/produk' | '/user' | '/' | '/login'
   id:
     | '__root__'
     | '/login'
     | '/_layout'
     | '/_layout/produk'
+    | '/_layout/user'
     | '/_layout/'
     | '/login/'
   fileRoutesById: FileRoutesById
@@ -108,6 +118,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutIndexRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/user': {
+      id: '/_layout/user'
+      path: '/user'
+      fullPath: '/user'
+      preLoaderRoute: typeof LayoutUserRouteImport
+      parentRoute: typeof LayoutRoute
+    }
     '/_layout/produk': {
       id: '/_layout/produk'
       path: '/produk'
@@ -132,11 +149,13 @@ const LoginRouteRouteWithChildren = LoginRouteRoute._addFileChildren(
 
 interface LayoutRouteChildren {
   LayoutProdukRoute: typeof LayoutProdukRoute
+  LayoutUserRoute: typeof LayoutUserRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutProdukRoute: LayoutProdukRoute,
+  LayoutUserRoute: LayoutUserRoute,
   LayoutIndexRoute: LayoutIndexRoute,
 }
 

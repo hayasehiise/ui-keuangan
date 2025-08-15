@@ -29,8 +29,14 @@ export async function login(input: { username: string; password: string }) {
 }
 
 export async function logout() {
-  await fetch(`${apiUrl}`, {
+  const res = await fetch(`${apiUrl}/auth/logout`, {
     method: 'POST',
     credentials: 'include',
   })
+
+  if (!res.ok) {
+    throw new Error('Logout gagal')
+  }
+
+  return res.json()
 }
