@@ -8,7 +8,6 @@ import {
 import { authUserOption } from '@/query/authUser'
 import { getCurrentUser } from '@/api/auth'
 import { useEffect, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/_layout')({
   beforeLoad: async ({ context }) => {
