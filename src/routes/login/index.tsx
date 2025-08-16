@@ -2,6 +2,7 @@ import { useLogin } from '@/lib/auth'
 import { loginAuthOption } from '@/query/authUser'
 import { useForm } from '@tanstack/react-form'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/login/')({
   beforeLoad: async ({ context }) => {
@@ -20,6 +21,7 @@ export const Route = createFileRoute('/login/')({
 function LoginPage() {
   const login = useLogin()
   const navigate = useNavigate()
+  const [showToast, setShowToast] = useState(false)
 
   const form = useForm({
     defaultValues: {
@@ -27,8 +29,15 @@ function LoginPage() {
       password: '',
     },
     onSubmit: async ({ value }) => {
-      await login.mutateAsync(value)
-      navigate({ to: '/' })
+      try {
+        await login.mutateAsync(value)
+        navigate({ to: '/' })
+      } catch {
+        setShowToast(true)
+        setTimeout(() => {
+          setShowToast(false)
+        }, 2000)
+      }
     },
   })
 
@@ -97,6 +106,13 @@ function LoginPage() {
           </form.Subscribe>
         </form>
       </fieldset>
+      {showToast && (
+        <div className="toast toast-end toast-top">
+          <div className="alert alert-error">
+            <span>Login Gagal</span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

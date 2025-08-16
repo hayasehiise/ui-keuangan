@@ -1,5 +1,5 @@
-import { queryOptions } from '@tanstack/react-query'
-import { getCurrentUser } from '@/api/auth'
+import { mutationOptions, queryOptions } from '@tanstack/react-query'
+import { getCurrentUser, logout } from '@/api/auth'
 
 export function authUserOption() {
   return queryOptions({
@@ -13,5 +13,11 @@ export function loginAuthOption() {
     queryKey: ['authUser'],
     queryFn: getCurrentUser,
     staleTime: 1000 * 60 * 5,
+  })
+}
+
+export function logoutAuthOption() {
+  return mutationOptions({
+    mutationFn: logout,
   })
 }
